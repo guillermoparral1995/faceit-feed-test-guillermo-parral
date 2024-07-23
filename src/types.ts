@@ -1,6 +1,11 @@
+interface AuthorAvatar {
+    thumbnail: string;
+    picture: string;
+}
+
 interface PostAuthor {
     name: string;
-    avatar: string;
+    avatar: AuthorAvatar;
 }
 
 interface PostContent {

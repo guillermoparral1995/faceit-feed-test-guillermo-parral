@@ -1,9 +1,10 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import Post from "./post";
 import { useGetPaginatedPostsQuery } from "@/store/api";
 import { nextPage } from "@/store/paginationSlice";
+import Post from "@/components/Post";
+import LoadingSkeleton from "@/components/LoadingSkeleton";
 
 export default function HomePage() {
   const dispatch = useAppDispatch();
@@ -20,8 +21,10 @@ export default function HomePage() {
   useEffect(() => {
     const handleScroll = () => {
       const bottom =
-        document.body.scrollHeight - window.scrollY === window.innerHeight;
-      if (bottom) {
+        document.documentElement.offsetHeight -
+          document.documentElement.scrollTop ===
+        window.innerHeight;
+      if (bottom && !isLoading && !isFetching) {
         dispatch(nextPage());
       }
     };
@@ -30,12 +33,13 @@ export default function HomePage() {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [isLoading, dispatch]);
+  }, [dispatch, isLoading, isFetching]);
 
   return (
     <main ref={listRef}>
       {posts &&
         posts.map((post: Post) => <Post key={post.id} post={post}></Post>)}
+      {(isFetching || isLoading) && <LoadingSkeleton />}
     </main>
   );
 }

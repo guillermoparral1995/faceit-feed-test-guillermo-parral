@@ -10,14 +10,14 @@ interface PostPageParams {
 export default async function PostPage({ params }: PostPageParams) {
   const post: Post | undefined = await getPost(params.id);
   return post ? (
-    <article>
+    <article className="flex flex-col items-center max-w-3xl mx-auto">
       <Image
-        src={post.author.avatar}
+        src={post.author.avatar.picture}
         alt={post.author.name}
-        width={40}
-        height={40}
+        width={250}
+        height={250}
       />
-      <h3>{post.author.name}</h3>
+      <h2 className="font-bold text-2xl my-4">{post.author.name}</h2>
       <p>{post.post.body}</p>
     </article>
   ) : (
