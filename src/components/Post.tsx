@@ -6,7 +6,6 @@ interface PostProps {
 }
 
 export default function Post({ post }: PostProps) {
-  console.log("post!", post);
   return (
     <Link href={`/${post.id}`}>
       <article className="cursor-pointer flex gap-4 max-w-3xl mx-auto dark:prose-dark rounded-md border-2 p-4 my-4">

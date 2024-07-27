@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Wrapper from "./wrapper";
+import StoreProvider from "../store/StoreProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,7 +17,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}><Wrapper>{children}</Wrapper></body>
+      <body className={`${inter.className} p-10`}>
+        <nav>
+          <h1 className="text-center text-xl font-bold">FACEIT Feed test</h1>
+        </nav>
+        <StoreProvider>{children}</StoreProvider>
+      </body>
     </html>
   );
 }
