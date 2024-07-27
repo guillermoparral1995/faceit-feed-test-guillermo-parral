@@ -1,4 +1,4 @@
-import { createApi, EndpointDefinition, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 type PaginationParams = {
     limit?: number,
@@ -19,8 +19,13 @@ export const postsApi = createApi({
         return currentArg?.limit !== previousArg?.limit || currentArg?.offset !== previousArg?.offset;
       },
     }),
-    
+    triggerNotification: builder.mutation<void, void>({
+      query: () => ({
+        url: '',
+        method: 'POST',
+      })
+    })
   }),
 })
 
-export const { useGetPaginatedPostsQuery } = postsApi
+export const { useGetPaginatedPostsQuery, useTriggerNotificationMutation } = postsApi

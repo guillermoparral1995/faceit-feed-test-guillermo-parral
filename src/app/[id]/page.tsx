@@ -1,5 +1,6 @@
 import Image from "next/image";
-import MOCK_DATA from "../MOCK_DATA.json";
+import dbConnection from "@/lib/mongodb";
+import { WithId } from "mongodb";
 
 interface PostPageParams {
   params: {
@@ -8,7 +9,7 @@ interface PostPageParams {
 }
 
 export default async function PostPage({ params }: PostPageParams) {
-  const post: Post | undefined = await getPost(params.id);
+  const post: Post | null = await getPost(params.id);
   return post ? (
     <article className="flex flex-col items-center max-w-3xl mx-auto">
       <Image
@@ -21,10 +22,20 @@ export default async function PostPage({ params }: PostPageParams) {
       <p>{post.post.body}</p>
     </article>
   ) : (
-    <p>Post not found</p>
+    <p className="text-center">Post not found</p>
   );
 }
 
-export async function getPost(id: string): Promise<Post | undefined> {
-  return MOCK_DATA.find((post) => post.id === Number(id));
+export async function getPost(id: string): Promise<Post | null> {
+  try {
+    const client = await dbConnection;
+    const db = client.db();
+    const post = await db.collection<Post>("posts").findOne({ id: Number(id) });
+    return post
+      ? { id: post?.id, author: post?.author, post: post?.post }
+      : null;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
 }
