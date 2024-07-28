@@ -18,3 +18,8 @@ interface Post {
     author: PostAuthor
     post: PostContent;
 }
+
+type PaginatedPosts = {
+    posts: Post[];
+    hasNext: boolean;
+};

@@ -1,40 +1,41 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { io } from "socket.io-client";
+
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import {
-  useGetPaginatedPostsQuery,
-  useTriggerNotificationMutation,
-} from "@/store/api";
+import { postsApi, useGetPaginatedPostsQuery } from "@/store/api";
 import { nextPage } from "@/store/paginationSlice";
 import Post from "@/components/Post";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
-import { useWebSocket } from "next-ws/client";
 
 export default function HomePage() {
   const dispatch = useAppDispatch();
-  const listRef = useRef<HTMLElement>(null);
-  const offset = useAppSelector((state) => state.pagination.offset);
-  const ws = useWebSocket();
+  const { limit, offset } = useAppSelector((state) => state.pagination);
+  const [highlight, setHighlight] = useState<boolean>(false);
 
   const {
-    data: posts,
+    data: paginatedPosts,
     error,
     isLoading,
     isFetching,
-  } = useGetPaginatedPostsQuery({ limit: 20, offset });
-
-  const [triggerNotification, triggerResult] = useTriggerNotificationMutation();
+    refetch,
+  } = useGetPaginatedPostsQuery({ limit, offset });
 
   useEffect(() => {
-    async function onMessage(event: MessageEvent) {
-      const payload =
-        typeof event.data === "string" ? event.data : await event.data.text();
-      const message = JSON.parse(payload);
-    }
-
-    ws?.addEventListener("message", onMessage);
-    return () => ws?.removeEventListener("message", onMessage);
-  }, [ws]);
+    const socket = io("http://localhost:8080");
+    socket.on("new_post", (message: Post) => {
+      dispatch(postsApi.util.resetApiState());
+      refetch();
+      setHighlight(true);
+      setTimeout(() => {
+        setHighlight(false);
+      }, 3000);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+    return () => {
+      socket.disconnect();
+    };
+  }, [dispatch, refetch]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -42,7 +43,7 @@ export default function HomePage() {
         document.documentElement.offsetHeight -
           document.documentElement.scrollTop ===
         window.innerHeight;
-      if (bottom && !isLoading && !isFetching) {
+      if (bottom && !isLoading && !isFetching && paginatedPosts?.hasNext) {
         dispatch(nextPage());
       }
     };
@@ -51,18 +52,29 @@ export default function HomePage() {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [dispatch, isLoading, isFetching]);
+  }, [dispatch, isLoading, isFetching, paginatedPosts?.hasNext]);
 
-  const handleTriggerNewPost = () => {
-    triggerNotification();
-  };
+  const handleTriggerNewPost = useCallback(() => {
+    fetch("/api", { method: "POST" });
+  }, []);
 
   return (
     <>
-      <button onClick={handleTriggerNewPost}>Trigger new post</button>
-      <main ref={listRef}>
-        {posts &&
-          posts.map((post: Post) => <Post key={post.id} post={post}></Post>)}
+      <button
+        className="border rounded-sm fixed p-2 bg-cyan-500 cursor-pointer z-10"
+        onClick={handleTriggerNewPost}
+      >
+        Trigger new post
+      </button>
+      <main>
+        {paginatedPosts?.posts &&
+          paginatedPosts.posts.map((post: Post, idx: number) => (
+            <Post
+              key={post.id}
+              post={post}
+              withHighlight={highlight && idx === 0}
+            ></Post>
+          ))}
         {(isFetching || isLoading) && <LoadingSkeleton />}
       </main>
     </>

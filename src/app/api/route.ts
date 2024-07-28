@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import dbConnection from "@/lib/mongodb";
+import io from '@/lib/ws';
 import { faker } from '@faker-js/faker';
 
 /**
@@ -7,7 +8,8 @@ import { faker } from '@faker-js/faker';
  * @param request - NextRequest object which receives "limit" and "offset" for pagination
  * @returns - NextResponse object with Post[] or error message
  */
-export async function GET(request: NextRequest): Promise<NextResponse<Post[] | { error: string }>> {
+
+export async function GET(request: NextRequest): Promise<NextResponse<PaginatedPosts | { error: string }>> {
     const queryParams = request.nextUrl.searchParams;
     const limit = Number(queryParams.get('limit')) || 20;
     const offset = Number(queryParams.get('offset')) || 0;
@@ -15,8 +17,11 @@ export async function GET(request: NextRequest): Promise<NextResponse<Post[] | {
     try {
         const client = await dbConnection;
         const db = client.db();
-        const posts: Post[] = await db.collection<Post>('posts').find().sort({ "post.created_at": -1 }).limit(limit).skip(offset).toArray();
-        return NextResponse.json(posts, { status: 200 });
+        const totalDocuments = await db.collection<Post>('posts').countDocuments();
+        const cursor = db.collection<Post>('posts').find().sort({ "post.created_at": -1 }).skip(offset);
+        const posts: Post[] = await cursor.limit(limit).toArray();
+        const hasNext = totalDocuments > offset + limit;
+        return NextResponse.json({ posts, hasNext }, { status: 200 });
       } catch (error) {
         return NextResponse.json({ error: 'Unable to fetch posts' }, { status: 500 });
       }
@@ -52,6 +57,7 @@ export async function POST(_request: NextRequest): Promise<NextResponse<{ error:
         const postCount = await db.collection<Post>('posts').countDocuments();
         const newPost: Post = generateRandomPost(postCount + 1)
         await db.collection<Post>('posts').insertOne(newPost);
+        io.emit('new_post', newPost)
         return NextResponse.json({ message: 'OK!' }, { status: 200 });
       } catch (error) {
         return NextResponse.json({ error: 'Unable to fetch posts' }, { status: 500 });

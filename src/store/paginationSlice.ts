@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 interface PaginationState {
   limit: number
@@ -15,6 +15,9 @@ export const paginationSlice = createSlice({
   initialState,
   reducers: {
     nextPage: (state) => {
+      if (state.limit !== 20) {
+        state.limit = 20
+      }
       state.offset += state.limit
     },
   },

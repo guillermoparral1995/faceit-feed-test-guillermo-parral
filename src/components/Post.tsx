@@ -3,12 +3,17 @@ import Link from "next/link";
 
 interface PostProps {
   post: Post;
+  withHighlight: boolean;
 }
 
-export default function Post({ post }: PostProps) {
+export default function Post({ post, withHighlight }: PostProps) {
   return (
-    <Link href={`/${post.id}`}>
-      <article className="cursor-pointer flex gap-4 max-w-3xl mx-auto dark:prose-dark rounded-md border-2 p-4 my-4">
+    <article
+      className={`cursor-pointer max-w-3xl mx-auto dark:prose-dark rounded-md border-2 p-4 my-4 ${
+        withHighlight ? "bg-yellow-500" : ""
+      }`}
+    >
+      <Link className="flex gap-4" href={`/${post.id}`}>
         <div className="flex-none">
           <Image
             src={post.author.avatar.thumbnail}
@@ -21,7 +26,7 @@ export default function Post({ post }: PostProps) {
           <h3 className="mb-2 font-bold">{post.author.name}</h3>
           <p className="line-clamp-2 font-normal">{post.post.body}</p>
         </div>
-      </article>
-    </Link>
+      </Link>
+    </article>
   );
 }

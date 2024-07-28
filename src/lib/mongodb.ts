@@ -6,15 +6,20 @@ if (!process.env.MONGODB_URI) {
   throw new Error('Please add your Mongo URI to .env.local');
 }
 
-const mongoClient = new MongoClient(uri!);
-const dbConnection = mongoClient.connect();
+let mongoClient;
+let dbConnection: Promise<MongoClient>;
 
-const prepareIndex = async () => {
-  const client = await dbConnection;
-  const db = client.db();
+if (!mongoClient) {
+  mongoClient = new MongoClient(uri!);
+  dbConnection = mongoClient.connect();
 
-  await db.collection<Post>('posts').createIndex( { "post.created_at": 1 } )
+  const prepareIndex = async () => {
+    const client: MongoClient = await dbConnection;
+    const db = client.db();
+  
+    await db.collection<Post>('posts').createIndex( { "post.created_at": 1 } )
+  }
+  prepareIndex()
 }
-prepareIndex()
 
 export default dbConnection;

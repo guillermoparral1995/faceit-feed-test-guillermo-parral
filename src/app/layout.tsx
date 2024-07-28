@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import StoreProvider from "../store/StoreProvider";
+import { Suspense } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,7 +22,9 @@ export default function RootLayout({
         <nav>
           <h1 className="text-center text-xl font-bold">FACEIT Feed test</h1>
         </nav>
-        <StoreProvider>{children}</StoreProvider>
+        <Suspense>
+          <StoreProvider>{children}</StoreProvider>
+        </Suspense>
       </body>
     </html>
   );
