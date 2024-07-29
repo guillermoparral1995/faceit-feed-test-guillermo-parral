@@ -13,14 +13,16 @@ export default function HomePage() {
   const { limit, offset } = useAppSelector((state) => state.pagination);
   const [highlight, setHighlight] = useState<boolean>(false);
 
+  // Fetch paginated posts from the API
   const {
     data: paginatedPosts,
-    error,
     isLoading,
     isFetching,
     refetch,
   } = useGetPaginatedPostsQuery({ limit, offset });
 
+  // Initialise WebSocket connection with the server, and trigger a refetch when a new post is received
+  // When refetch has happened, scroll to and highlight new post
   useEffect(() => {
     const socket = io("http://localhost:8080");
     socket.on("new_post", (message: Post) => {
@@ -54,6 +56,9 @@ export default function HomePage() {
     };
   }, [dispatch, isLoading, isFetching, paginatedPosts?.hasNext]);
 
+  // Trigger new post by calling the API. Don't use a mutation so that automatic refetch is not enacted.
+  // In real-life, a new post would be created without the user knowing about it and the server would be informed
+  // via some kind of event broker. For the sake of this example, we're just calling the API directly.
   const handleTriggerNewPost = useCallback(() => {
     fetch("/api", { method: "POST" });
   }, []);

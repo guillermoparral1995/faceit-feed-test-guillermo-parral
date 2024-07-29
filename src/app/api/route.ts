@@ -46,7 +46,7 @@ const generateRandomPost = (id: number): Post => {
 
 /**
  * POST endpoint for triggering creating a new post from the client
- * This behavior is intended to mock a real-time post creation, in reality we would expect the posts to be created in the background by other users
+ * This behavior is intended to mock a real-time post creation, in reality we would expect the posts to be created in the background by other users and then be notified via an event broker
  * @param _request - NextRequest object
  * @returns
  */

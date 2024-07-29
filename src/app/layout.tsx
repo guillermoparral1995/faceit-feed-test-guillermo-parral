@@ -22,6 +22,7 @@ export default function RootLayout({
         <nav>
           <h1 className="text-center text-xl font-bold">FACEIT Feed test</h1>
         </nav>
+        {/* At some points, the layout would throw an error because of some issues while re-rendering after fast refresh. Wrapping this in a suspense fixed it since it'd allow to wait for the client component gracefully */}
         <Suspense>
           <StoreProvider>{children}</StoreProvider>
         </Suspense>

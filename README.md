@@ -1,36 +1,31 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# FACEIT Feed test
 
-## Getting Started
+### Setup
 
-First, run the development server:
+You should have Docker installed, since it uses Docker to start up a mock database.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+1. Run Docker
+2. Provide access to setup/teardown scripts
+
+```
+chmod +x ./scripts/setup.sh
+chmod +x ./scripts/teardown.sh
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+3. Start up the dev environment
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+### Explanation
 
-## Learn More
+This app is built using Next.js 14, which uses the new App Router. Both frontend and backend are served by Next.js inside the `./src/app` folder, with `./src/app/api` exposing the backend endpoints.
 
-To learn more about Next.js, take a look at the following resources:
+State management is handled with Redux, using RTK and RTK Query for fetching information from the backend and then implementing pagination logic to achieve the infinite scrolling.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+When starting up the dev environment, a Docker container with a MongoDB image is spun up with mock information filled from a generated JSON with all the posts information.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+In order to mock the generation of new posts by other users, there's an extra endpoint to add new posts to the DB. I wanted the triggering of new posts to be completely independent of the RTK Query cache in order to best represent a real case scenario where new posts would be generated without the client even realising about it, so in order to achieve that, the trigger doesn't use a Redux mutation, but rather is just a regular POST call to the server. This way, the existing endpoint's subscription wouldn't cause an automatic refetch, which wouldn't be quite representative of a real-life situation.
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Communication from the server to the client is achieved by using WebSockets with `socket.io`. Whenever there's a new post, the server sends a message to the client, which then proceeds to scroll to and highlight the new post.

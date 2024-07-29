@@ -13,6 +13,7 @@ if (!mongoClient) {
   mongoClient = new MongoClient(uri!);
   dbConnection = mongoClient.connect();
 
+  // Create index for posts collection sorted by descending created_at
   const prepareIndex = async () => {
     const client: MongoClient = await dbConnection!;
     const db = client.db();
