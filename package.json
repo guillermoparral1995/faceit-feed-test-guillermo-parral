@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "./scripts/setup.sh && next dev",
+    "dev": "./scripts/setup.sh && next dev && ./scripts/teardown.sh",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"

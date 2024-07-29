@@ -1,6 +1,5 @@
 import Image from "next/image";
 import dbConnection from "@/lib/mongodb";
-import { WithId } from "mongodb";
 
 interface PostPageParams {
   params: {
@@ -29,7 +28,7 @@ export default async function PostPage({ params }: PostPageParams) {
 export async function getPost(id: string): Promise<Post | null> {
   try {
     const client = await dbConnection;
-    const db = client.db();
+    const db = client!.db();
     const post = await db.collection<Post>("posts").findOne({ id: Number(id) });
     return post
       ? { id: post?.id, author: post?.author, post: post?.post }

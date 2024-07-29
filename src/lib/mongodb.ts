@@ -7,14 +7,14 @@ if (!process.env.MONGODB_URI) {
 }
 
 let mongoClient;
-let dbConnection: Promise<MongoClient>;
+let dbConnection: Promise<MongoClient> | undefined;
 
 if (!mongoClient) {
   mongoClient = new MongoClient(uri!);
   dbConnection = mongoClient.connect();
 
   const prepareIndex = async () => {
-    const client: MongoClient = await dbConnection;
+    const client: MongoClient = await dbConnection!;
     const db = client.db();
   
     await db.collection<Post>('posts').createIndex( { "post.created_at": 1 } )

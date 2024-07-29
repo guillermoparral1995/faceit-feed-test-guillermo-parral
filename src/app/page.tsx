@@ -73,7 +73,7 @@ export default function HomePage() {
               key={post.id}
               post={post}
               withHighlight={highlight && idx === 0}
-            ></Post>
+            />
           ))}
         {(isFetching || isLoading) && <LoadingSkeleton />}
       </main>

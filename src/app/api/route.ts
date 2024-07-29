@@ -16,7 +16,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<PaginatedP
     
     try {
         const client = await dbConnection;
-        const db = client.db();
+        const db = client!.db();
         const totalDocuments = await db.collection<Post>('posts').countDocuments();
         const cursor = db.collection<Post>('posts').find().sort({ "post.created_at": -1 }).skip(offset);
         const posts: Post[] = await cursor.limit(limit).toArray();
@@ -53,11 +53,11 @@ const generateRandomPost = (id: number): Post => {
 export async function POST(_request: NextRequest): Promise<NextResponse<{ error: string } | { message: string }>> {
     try {
         const client = await dbConnection;
-        const db = client.db();
+        const db = client!.db();
         const postCount = await db.collection<Post>('posts').countDocuments();
         const newPost: Post = generateRandomPost(postCount + 1)
         await db.collection<Post>('posts').insertOne(newPost);
-        io.emit('new_post', newPost)
+        io!.emit('new_post', newPost)
         return NextResponse.json({ message: 'OK!' }, { status: 200 });
       } catch (error) {
         return NextResponse.json({ error: 'Unable to fetch posts' }, { status: 500 });

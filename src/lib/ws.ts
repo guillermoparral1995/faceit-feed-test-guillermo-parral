@@ -1,25 +1,25 @@
-import { createServer } from "http";
 import { Server } from "socket.io";
 
-let io: Server;
+const globalForSockets = global as unknown as { io: Server | undefined };
+
+let io: Server | undefined = globalForSockets.io;
 
 if(!io) {
     io = new Server({
       cors: {
-        origin: "http://localhost:3000",
+        origin: process.env.NEXT_HOST,
       }
     });
 
     io.on("connection", (socket) => {
-      console.log('Websocket server listening on port 8080')
+      console.log(`Websocket server listening on port ${process.env.WS_PORT}.`)
       socket.on("disconnect", () => {
         console.log("Client disconnected!");
-        io.close();
-        io = undefined;
       })
     })
     
-    io.listen(8080);
+    io.listen(Number(process.env.WS_PORT));
+    globalForSockets.io = io;
 }
 
 export default io;

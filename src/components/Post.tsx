@@ -9,8 +9,8 @@ interface PostProps {
 export default function Post({ post, withHighlight }: PostProps) {
   return (
     <article
-      className={`cursor-pointer max-w-3xl mx-auto dark:prose-dark rounded-md border-2 p-4 my-4 ${
-        withHighlight ? "bg-yellow-500" : ""
+      className={`cursor-pointer max-w-3xl mx-auto dark:prose-dark rounded-md border-2 p-4 my-4 transition duration-500 ${
+        withHighlight ? "bg-yellow-500" : "bg-transparent"
       }`}
     >
       <Link className="flex gap-4" href={`/${post.id}`}>
