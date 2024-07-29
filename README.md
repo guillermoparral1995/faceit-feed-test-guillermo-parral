@@ -15,6 +15,7 @@ chmod +x ./scripts/teardown.sh
 3. Start up the dev environment
 
 ```
+npm i
 npm run dev
 ```
 
