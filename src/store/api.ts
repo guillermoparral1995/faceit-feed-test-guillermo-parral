@@ -13,12 +13,14 @@ export const postsApi = createApi({
       query: ({ limit = 20, offset = 0 }) => ({ url: `?limit=${limit}&offset=${offset}` }),
       serializeQueryArgs: ({ endpointName }) => endpointName,
       merge: (currentCache, newItems) => {
+        console.log('currentCache', currentCache.posts.length)
         return {
           hasNext: newItems.hasNext,
           posts: [...currentCache.posts, ...newItems.posts],
         }
       },
       forceRefetch({ currentArg, previousArg }: { currentArg?: PaginationParams, previousArg?: PaginationParams }) {
+        console.log('force refetch')
         return currentArg?.limit !== previousArg?.limit || currentArg?.offset !== previousArg?.offset;
       },
     }),

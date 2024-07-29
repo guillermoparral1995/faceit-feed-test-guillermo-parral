@@ -1,6 +1,9 @@
 const SkeletonPost = () => {
   return (
-    <article className="animate-pulse flex gap-4 max-w-3xl mx-auto dark:prose-dark rounded-md border-2 border-slate-400 p-4 my-4">
+    <article
+      data-testid="skeleton"
+      className="animate-pulse flex gap-4 max-w-3xl mx-auto dark:prose-dark rounded-md border-2 border-slate-400 p-4 my-4"
+    >
       <div className="flex-none">
         <div className="w-10 h-10 bg-slate-400 rounded-sm"></div>
       </div>

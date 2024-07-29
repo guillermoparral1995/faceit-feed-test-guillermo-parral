@@ -29,3 +29,25 @@ When starting up the dev environment, a Docker container with a MongoDB image is
 In order to mock the generation of new posts by other users, there's an extra endpoint to add new posts to the DB. I wanted the triggering of new posts to be completely independent of the RTK Query cache in order to best represent a real case scenario where new posts would be generated without the client even realising about it, so in order to achieve that, the trigger doesn't use a Redux mutation, but rather is just a regular POST call to the server. This way, the existing endpoint's subscription wouldn't cause an automatic refetch, which wouldn't be quite representative of a real-life situation.
 
 Communication from the server to the client is achieved by using WebSockets with `socket.io`. Whenever there's a new post, the server sends a message to the client, which then proceeds to scroll to and highlight the new post.
+
+### Testing
+
+This project has snapshot tests for LoadingSkeleton and Post components, which are basic functional components. These are made using Jest and React Testing Library.
+
+It also has E2E testing for all navigation, scrolling behavior and updates on new posts by using Cypress.
+
+To run snapshot tests, run
+
+```
+npm run test
+```
+
+For E2E tests, run in one terminal
+```
+npm run dev
+```
+
+and then
+```
+npm run cypress:open
+```

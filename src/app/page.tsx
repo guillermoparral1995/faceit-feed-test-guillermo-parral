@@ -2,9 +2,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { io } from "socket.io-client";
 
-import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { postsApi, useGetPaginatedPostsQuery } from "@/store/api";
-import { nextPage } from "@/store/paginationSlice";
+import { nextPage, setupForNewPost } from "@/store/paginationSlice";
 import Post from "@/components/Post";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
 
@@ -25,9 +25,9 @@ export default function HomePage() {
   // When refetch has happened, scroll to and highlight new post
   useEffect(() => {
     const socket = io("http://localhost:8080");
-    socket.on("new_post", (message: Post) => {
+    socket.on("new_post", () => {
       dispatch(postsApi.util.resetApiState());
-      refetch();
+      dispatch(setupForNewPost());
       setHighlight(true);
       setTimeout(() => {
         setHighlight(false);
